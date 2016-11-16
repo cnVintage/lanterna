@@ -52,6 +52,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class StreamBasedTerminal extends AbstractTerminal {
 
     private static final Charset UTF8_REFERENCE = Charset.forName("UTF-8");
+    private static final Charset GBK_REFERENCE = Charset.forName("GBK");
 
     private final InputStream terminalInput;
     private final OutputStream terminalOutput;
@@ -252,8 +253,48 @@ public abstract class StreamBasedTerminal extends AbstractTerminal {
 
     @SuppressWarnings("WeakerAccess")
     protected byte[] translateCharacter(char input) {
-        if(UTF8_REFERENCE != null && UTF8_REFERENCE == terminalCharset) {
+        if (UTF8_REFERENCE != null && UTF8_REFERENCE == terminalCharset) {
             return convertToCharset(input);
+        }
+        
+        if (GBK_REFERENCE != null && GBK_REFERENCE == terminalCharset) {
+            switch(input) {
+                case Symbols.DOUBLE_LINE_CROSS:
+                case Symbols.SINGLE_LINE_CROSS:
+                case Symbols.DOUBLE_LINE_BOTTOM_LEFT_CORNER:
+                case Symbols.SINGLE_LINE_BOTTOM_LEFT_CORNER:
+                case Symbols.DOUBLE_LINE_BOTTOM_RIGHT_CORNER:
+                case Symbols.SINGLE_LINE_BOTTOM_RIGHT_CORNER:
+                case Symbols.DOUBLE_LINE_T_DOWN:
+                case Symbols.SINGLE_LINE_T_DOWN:
+                case Symbols.DOUBLE_LINE_T_SINGLE_DOWN:
+                case Symbols.SINGLE_LINE_T_DOUBLE_DOWN:
+                case Symbols.DOUBLE_LINE_T_LEFT:
+                case Symbols.SINGLE_LINE_T_LEFT:
+                case Symbols.DOUBLE_LINE_T_SINGLE_LEFT:
+                case Symbols.SINGLE_LINE_T_DOUBLE_LEFT:
+                case Symbols.DOUBLE_LINE_T_RIGHT:
+                case Symbols.SINGLE_LINE_T_RIGHT:
+                case Symbols.DOUBLE_LINE_T_SINGLE_RIGHT:
+                case Symbols.SINGLE_LINE_T_DOUBLE_RIGHT:
+                case Symbols.DOUBLE_LINE_T_UP:
+                case Symbols.SINGLE_LINE_T_UP:
+                case Symbols.DOUBLE_LINE_T_SINGLE_UP:
+                case Symbols.SINGLE_LINE_T_DOUBLE_UP:
+                case Symbols.DOUBLE_LINE_TOP_LEFT_CORNER:
+                case Symbols.SINGLE_LINE_TOP_LEFT_CORNER:
+                case Symbols.DOUBLE_LINE_TOP_RIGHT_CORNER:
+                case Symbols.SINGLE_LINE_TOP_RIGHT_CORNER:
+                    return new byte[]{'+'};
+                case Symbols.DOUBLE_LINE_HORIZONTAL:
+                case Symbols.SINGLE_LINE_HORIZONTAL:
+                    return new byte[]{'-'};
+                case Symbols.DOUBLE_LINE_VERTICAL:
+                case Symbols.SINGLE_LINE_VERTICAL:
+                    return new byte[]{'|'};
+                default:
+                    return convertToCharset(input);
+            }      
         }
         //Convert ACS to ordinary terminal codes
         switch(input) {

@@ -39,6 +39,7 @@ public class DefaultKeyDecodingProfile implements KeyDecodingProfile {
                                 new BasicCharacterPattern(new KeyStroke(KeyType.Tab), '\t'),
                                 new BasicCharacterPattern(new KeyStroke(KeyType.Enter), '\n'),
                                 new BasicCharacterPattern(new KeyStroke(KeyType.Enter), '\r', '\u0000'), //OS X
+                                new BasicCharacterPattern(new KeyStroke(KeyType.Enter), '\r', '\n'),     //Windows
                                 new BasicCharacterPattern(new KeyStroke(KeyType.Backspace), (char) 0x7f),
                                 new BasicCharacterPattern(new KeyStroke(KeyType.Backspace), (char) 0x08), //Windows
                                 new BasicCharacterPattern(new KeyStroke(KeyType.F1), ESC_CODE, '[', '[', 'A'), //Linux

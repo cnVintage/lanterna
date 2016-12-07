@@ -292,6 +292,9 @@ public abstract class StreamBasedTerminal extends AbstractTerminal {
                 case Symbols.DOUBLE_LINE_VERTICAL:
                 case Symbols.SINGLE_LINE_VERTICAL:
                     return new byte[]{'|'};
+                case Symbols.BLOCK_SPARSE:
+                case Symbols.BLOCK_MIDDLE:
+                    return new byte[]{' '};
                 default:
                     return convertToCharset(input);
             }      

@@ -61,7 +61,8 @@ public class TerminalTextUtils {
                 || (unicodeBlock == Character.UnicodeBlock.CJK_RADICALS_SUPPLEMENT)
                 || (unicodeBlock == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION)
                 || (unicodeBlock == Character.UnicodeBlock.ENCLOSED_CJK_LETTERS_AND_MONTHS)
-                || (unicodeBlock == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS && c < 0xFF61);    //The magic number here is the separating index between full-width and half-width
+                || (unicodeBlock == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS && c < 0xFF61)     //The magic number here is the separating index between full-width and half-width
+                || (unicodeBlock == Character.UnicodeBlock.GENERAL_PUNCTUATION); //Hard to say, generally full width
     }
 
     /**

@@ -172,18 +172,19 @@ public abstract class StreamBasedTerminal extends AbstractTerminal {
     }
 
     /**
-     * Waits for up to 2 seconds for a terminal cursor position report to appear in the input stream. If the timeout
-     * expires, it throws {@code IllegalStateException}. You should have send the cursor position query already before
+     * Waits for up to 5 seconds for a terminal cursor position report to appear in the input stream. If the timeout
+     * expires, it will return null. You should have sent the cursor position query already before
      * calling this method.
-     * @return Current position of the cursor
+     * @return Current position of the cursor, or null if the terminal didn't report it in time.
      * @throws IOException If there was an I/O error
      */
     synchronized TerminalPosition waitForCursorPositionReport() throws IOException {
         long startTime = System.currentTimeMillis();
         TerminalPosition cursorPosition = lastReportedCursorPosition;
         while(cursorPosition == null) {
-            if(System.currentTimeMillis() - startTime > 2000) {
-                throw new IllegalStateException("Terminal didn't send any position report for 2 seconds, please file a bug with a reproduce!");
+            if(System.currentTimeMillis() - startTime > 5000) {
+                //throw new IllegalStateException("Terminal didn't send any position report for 2 seconds, please file a bug with a reproduce!");
+                return null;
             }
             KeyStroke keyStroke = readInput(false, false);
             if(keyStroke != null) {
@@ -295,6 +296,19 @@ public abstract class StreamBasedTerminal extends AbstractTerminal {
                 case Symbols.BLOCK_SPARSE:
                 case Symbols.BLOCK_MIDDLE:
                     return new byte[]{' '};
+                //In GBK, these single width character would become
+                //double width, so manually replace them with single width
+                //alternate.
+                case 0x2014: //—
+                    return new byte[]{'-'};
+                case 0x00E8: case 0x00E9: case 0x00EA: case 0x00EB:
+                    return new byte[]{'e'};
+                case 0x00EC: case 0x00ED: case 0x00EE: case 0x00EF:
+                    return new byte[]{'i'};
+                case 0x00F2: case 0x00F3: case 0x00F4: case 0x00F5: case 0x00F6:
+                    return new byte[]{'o'};
+                case 0x201C: case 0x201D:
+                    return new byte[]{'"'};
                 default:
                     return convertToCharset(input);
             }      

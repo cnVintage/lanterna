@@ -56,7 +56,7 @@ public abstract class StreamBasedTerminal extends AbstractTerminal {
 
     private final InputStream terminalInput;
     private final OutputStream terminalOutput;
-    private final Charset terminalCharset;
+    private Charset terminalCharset;
 
     private final InputDecoder inputDecoder;
     private final Queue<KeyStroke> keyQueue;
@@ -248,8 +248,12 @@ public abstract class StreamBasedTerminal extends AbstractTerminal {
         }
     }
 
-    protected Charset getCharset() {
+    public Charset getCharset() {
         return terminalCharset;
+    }
+    
+    public void setCharset(Charset newCharset) {
+        terminalCharset = newCharset;
     }
 
     @SuppressWarnings("WeakerAccess")

@@ -263,7 +263,7 @@ public class TerminalTextUtils {
                     characterIndex--;
                 }
                 // right *after* a CJK is also a "nice" spot to break the line!
-                if (characterIndex >= 0 && characterIndex < characterIndexMax &&
+                while(characterIndex >= 0 && characterIndex < characterIndexMax &&
                       isCharCJK(row.charAt(characterIndex))) {
                     characterIndex++; // with these conditions it fits!
                 }

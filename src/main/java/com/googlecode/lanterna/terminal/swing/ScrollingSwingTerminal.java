@@ -30,7 +30,6 @@ import com.googlecode.lanterna.terminal.TerminalResizeListener;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import javax.swing.*;
 
@@ -268,6 +267,11 @@ public class ScrollingSwingTerminal extends JComponent implements IOSafeTerminal
     @Override
     public void flush() {
         swingTerminal.flush();
+    }
+
+    @Override
+    public void close() {
+        swingTerminal.close();
     }
 
     @Override

@@ -30,7 +30,6 @@ import com.googlecode.lanterna.terminal.TerminalResizeListener;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -267,6 +266,11 @@ public class ScrollingAWTTerminal extends Container implements IOSafeTerminal {
     @Override
     public void flush() {
         awtTerminal.flush();
+    }
+
+    @Override
+    public void close() {
+        awtTerminal.close();
     }
 
     @Override

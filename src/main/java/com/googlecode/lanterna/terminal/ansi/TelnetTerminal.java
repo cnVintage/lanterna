@@ -111,7 +111,9 @@ public class TelnetTerminal extends ANSITerminal {
      * Closes the socket to the client, effectively ending the telnet session and the terminal.
      * @throws IOException If there was an underlying I/O error
      */
+    @Override
     public void close() throws IOException {
+        super.close();
         socket.close();
     }
 

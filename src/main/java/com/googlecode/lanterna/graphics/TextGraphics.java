@@ -22,7 +22,6 @@ import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.screen.TabBehaviour;
 
 import java.util.Collection;
-import java.util.EnumSet;
 
 /**
  * This interface exposes functionality to 'draw' text graphics on a section of the terminal. It has several
@@ -44,7 +43,7 @@ import java.util.EnumSet;
  * with them. The reason is that not all implementations will handle the underlying terminal changing size.
  * @author Martin
  */
-public interface TextGraphics {
+public interface TextGraphics extends StyleSet<TextGraphics> {
     /**
      * Returns the size of the area that this text graphic can write to. Any attempts of placing characters outside of
      * this area will be silently ignored.
@@ -67,66 +66,6 @@ public interface TextGraphics {
      * TextGraphics in any way.
      */
     TextGraphics newTextGraphics(TerminalPosition topLeftCorner, TerminalSize size) throws IllegalArgumentException;
-
-    /**
-     * Returns the current background color
-     * @return Current background color
-     */
-    TextColor getBackgroundColor();
-
-    /**
-     * Updates the current background color
-     * @param backgroundColor New background color
-     * @return Itself
-     */
-    TextGraphics setBackgroundColor(TextColor backgroundColor);
-
-    /**
-     * Returns the current foreground color
-     * @return Current foreground color
-     */
-    TextColor getForegroundColor();
-
-    /**
-     * Updates the current foreground color
-     * @param foregroundColor New foreground color
-     * @return Itself
-     */
-    TextGraphics setForegroundColor(TextColor foregroundColor);
-
-    /**
-     * Adds zero or more modifiers to the set of currently active modifiers
-     * @param modifiers Modifiers to add to the set of currently active modifiers
-     * @return Itself
-     */
-    TextGraphics enableModifiers(SGR... modifiers);
-
-    /**
-     * Removes zero or more modifiers from the set of currently active modifiers
-     * @param modifiers Modifiers to remove from the set of currently active modifiers
-     * @return Itself
-     */
-    TextGraphics disableModifiers(SGR... modifiers);
-
-    /**
-     * Sets the active modifiers to exactly the set passed in to this method. Any previous state of which modifiers are
-     * enabled doesn't matter.
-     * @param modifiers Modifiers to set as active
-     * @return Itself
-     */
-    TextGraphics setModifiers(EnumSet<SGR> modifiers);
-
-    /**
-     * Removes all active modifiers
-     * @return Itself
-     */
-    TextGraphics clearModifiers();
-
-    /**
-     * Returns all the SGR codes that are currently active in the TextGraphic
-     * @return Currently active SGR modifiers
-     */
-    EnumSet<SGR> getActiveModifiers();
 
     /**
      * Retrieves the current tab behaviour, which is what the TextGraphics will use when expanding \t characters to
@@ -424,6 +363,59 @@ public interface TextGraphics {
      * @return Itself
      */
     TextGraphics putString(int column, int row, String string, Collection<SGR> extraModifiers);
+
+    /**
+     * Puts a string on the screen at the specified position with the current colors and modifiers. If the string
+     * contains newlines (\r and/or \n), the method will stop at the character before that; you have to manage
+     * multi-line strings yourself!
+     * <p>
+     * This method has an additional functionality to the regular {@link TextGraphics#putString(int, int, String)};
+     * if you embed ANSI CSI-style control sequences (like modifying text color or controlling SGR status), they will be
+     * interpreted as the string is printed and mutates the {@link TextGraphics} object. In this version of Lanterna,
+     * the following sequences are supported:
+     * <ul>
+     *     <li>Set foreground color</li>
+     *     <li>Set background color</li>
+     *     <li>Set/Clear bold style</li>
+     *     <li>Set/Clear underline style</li>
+     *     <li>Set/Clear blink style</li>
+     *     <li>Set/Clear reverse style</li>
+     *     <li>Clear all styles and colors (notice that this will return the state to what it was at the start of the method)</li>
+     * </ul>
+     * When the call is complete, the {@link TextGraphics} object will return to the color/style state it was in at the
+     * start of the call.
+     * @param column What column to put the string at
+     * @param row What row to put the string at
+     * @param string String to put on the screen
+     * @return Itself
+     */
+    TextGraphics putCSIStyledString(int column, int row, String string);
+
+    /**
+     * Puts a string on the screen at the specified position with the current colors and modifiers. If the string
+     * contains newlines (\r and/or \n), the method will stop at the character before that; you have to manage
+     * multi-line strings yourself!
+     * <p>
+     * This method has an additional functionality to the regular {@link TextGraphics#putString(int, int, String)};
+     * if you embed ANSI CSI-style control sequences (like modifying text color or controlling SGR status), they will be
+     * interpreted as the string is printed and mutates the {@link TextGraphics} object. In this version of Lanterna,
+     * the following sequences are supported:
+     * <ul>
+     *     <li>Set foreground color</li>
+     *     <li>Set background color</li>
+     *     <li>Set/Clear bold style</li>
+     *     <li>Set/Clear underline style</li>
+     *     <li>Set/Clear blink style</li>
+     *     <li>Set/Clear reverse style</li>
+     *     <li>Clear all styles and colors (notice that this will return the state to what it was at the start of the method)</li>
+     * </ul>
+     * When the call is complete, the {@link TextGraphics} object will return to the color/style state it was in at the
+     * start of the call.
+     * @param position Position to put the string at
+     * @param string String to put on the screen
+     * @return Itself
+     */
+    TextGraphics putCSIStyledString(TerminalPosition position, String string);
 
     /**
      * Returns the character at the specific position in the terminal. May return {@code null} if the TextGraphics

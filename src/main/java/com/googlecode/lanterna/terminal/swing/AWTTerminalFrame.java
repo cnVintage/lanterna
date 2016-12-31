@@ -29,7 +29,6 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.terminal.TerminalResizeListener;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
@@ -152,7 +151,12 @@ public class AWTTerminalFrame extends Frame implements IOSafeTerminal {
         super.dispose();
         disposed = true;
     }
-    
+
+    @Override
+    public void close() {
+        dispose();
+    }
+
     ///////////
     // Delegate all Terminal interface implementations to AWTTerminal
     ///////////

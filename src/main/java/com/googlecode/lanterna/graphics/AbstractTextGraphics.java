@@ -265,33 +265,12 @@ public abstract class AbstractTextGraphics implements TextGraphics {
 
     @Override
     public TextGraphics putString(int column, int row, String string) {
-        if(string.contains("\n")) {
-            string = string.substring(0, string.indexOf("\n"));
-        }
-        if(string.contains("\r")) {
-            string = string.substring(0, string.indexOf("\r"));
-        }
-        string = tabBehaviour.replaceTabs(string, column);
+        string = prepareStringForPut(column, string);
         int offset = 0;
         for(int i = 0; i < string.length(); i++) {
             char character = string.charAt(i);
-            setCharacter(
-                    column + offset,
-                    row,
-                    new TextCharacter(
-                            character,
-                            foregroundColor,
-                            backgroundColor,
-                            activeModifiers.clone()));
-            
-            if(TerminalTextUtils.isCharCJK(character)) {
-                //CJK characters are twice the normal characters in width, so next character position is two columns forward
-                offset += 2;
-            }
-            else {
-                //For "normal" characters we advance to the next column
-                offset += 1;
-            }
+            setCharacter(column + offset, row, newTextCharacter(character));
+            offset += getOffsetToNextCharacter(character);
         }
         return this;
     }
@@ -303,7 +282,8 @@ public abstract class AbstractTextGraphics implements TextGraphics {
     }
 
     @Override
-    public TextGraphics putString(int column, int row, String string, SGR extraModifier, SGR... optionalExtraModifiers) {clearModifiers();
+    public TextGraphics putString(int column, int row, String string, SGR extraModifier, SGR... optionalExtraModifiers) {
+        clearModifiers();
         return putString(column, row, string, EnumSet.of(extraModifier, optionalExtraModifiers));
     }
 
@@ -320,6 +300,35 @@ public abstract class AbstractTextGraphics implements TextGraphics {
     public TextGraphics putString(TerminalPosition position, String string, SGR extraModifier, SGR... optionalExtraModifiers) {
         putString(position.getColumn(), position.getRow(), string, extraModifier, optionalExtraModifiers);
         return this;
+    }
+
+    @Override
+    public synchronized TextGraphics putCSIStyledString(int column, int row, String string) {
+        StyleSet.Set original = new StyleSet.Set(this);
+        string = prepareStringForPut(column, string);
+        int offset = 0;
+        for(int i = 0; i < string.length(); i++) {
+            char character = string.charAt(i);
+            String controlSequence = TerminalTextUtils.getANSIControlSequenceAt(string, i);
+            if(controlSequence != null) {
+                TerminalTextUtils.updateModifiersFromCSICode(controlSequence, this, original);
+
+                // Skip the control sequence, leaving one extra, since we'll add it when we loop
+                i += controlSequence.length() - 1;
+                continue;
+            }
+
+            setCharacter(column + offset, row, newTextCharacter(character));
+            offset += getOffsetToNextCharacter(character);
+        }
+
+        setStyleFrom(original);
+        return this;
+    }
+
+    @Override
+    public TextGraphics putCSIStyledString(TerminalPosition position, String string) {
+        return putCSIStyledString(position.getColumn(), position.getRow(), string);
     }
 
     @Override
@@ -344,4 +353,35 @@ public abstract class AbstractTextGraphics implements TextGraphics {
     private TextCharacter newTextCharacter(char character) {
         return new TextCharacter(character, foregroundColor, backgroundColor, activeModifiers);
     }
+
+    private String prepareStringForPut(int column, String string) {
+        if(string.contains("\n")) {
+            string = string.substring(0, string.indexOf("\n"));
+        }
+        if(string.contains("\r")) {
+            string = string.substring(0, string.indexOf("\r"));
+        }
+        string = tabBehaviour.replaceTabs(string, column);
+        return string;
+    }
+
+    private int getOffsetToNextCharacter(char character) {
+        if(TerminalTextUtils.isCharDoubleWidth(character)) {
+            //CJK characters are twice the normal characters in width, so next character position is two columns forward
+            return 2;
+        }
+        else {
+            //For "normal" characters we advance to the next column
+            return 1;
+        }
+    }
+
+    @Override
+    public TextGraphics setStyleFrom(StyleSet<?> source) {
+        setBackgroundColor(source.getBackgroundColor());
+        setForegroundColor(source.getForegroundColor());
+        setModifiers(source.getActiveModifiers());
+        return this;
+    }
+
 }

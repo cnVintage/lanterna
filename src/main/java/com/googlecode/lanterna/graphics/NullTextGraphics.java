@@ -242,6 +242,16 @@ class NullTextGraphics implements TextGraphics {
     }
 
     @Override
+    public TextGraphics putCSIStyledString(int column, int row, String string) {
+        return this;
+    }
+
+    @Override
+    public TextGraphics putCSIStyledString(TerminalPosition position, String string) {
+        return this;
+    }
+
+    @Override
     public TextCharacter getCharacter(int column, int row) {
         return null;
     }
@@ -250,4 +260,13 @@ class NullTextGraphics implements TextGraphics {
     public TextCharacter getCharacter(TerminalPosition position) {
         return null;
     }
+
+    @Override
+    public TextGraphics setStyleFrom(StyleSet<?> source) {
+        setBackgroundColor(source.getBackgroundColor());
+        setForegroundColor(source.getForegroundColor());
+        setModifiers(source.getActiveModifiers());
+        return this;
+    }
+
 }

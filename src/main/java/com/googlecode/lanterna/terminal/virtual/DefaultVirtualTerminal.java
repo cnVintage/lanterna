@@ -24,7 +24,6 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.TabBehaviour;
 import com.googlecode.lanterna.terminal.AbstractTerminal;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -216,6 +215,13 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
     public synchronized void flush() {
         for(VirtualTerminalListener listener: listeners) {
             listener.onFlush();
+        }
+    }
+
+    @Override
+    public void close() {
+        for(VirtualTerminalListener listener: listeners) {
+            listener.onClose();
         }
     }
 
@@ -432,12 +438,12 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
     }
 
     private void correctCursor() {
+        this.cursorPosition = cursorPosition.withColumn(Math.min(cursorPosition.getColumn(), terminalSize.getColumns() - 1));
+        this.cursorPosition = cursorPosition.withRow(Math.min(cursorPosition.getRow(), Math.max(terminalSize.getRows(), getBufferLineCount()) - 1));
         this.cursorPosition =
                 new TerminalPosition(
                         Math.max(cursorPosition.getColumn(), 0),
                         Math.max(cursorPosition.getRow(), 0));
-        this.cursorPosition = cursorPosition.withColumn(Math.min(cursorPosition.getColumn(), terminalSize.getColumns() - 1));
-        this.cursorPosition = cursorPosition.withRow(Math.min(cursorPosition.getRow(), Math.max(terminalSize.getRows(), getBufferLineCount()) - 1));
     }
 
 }

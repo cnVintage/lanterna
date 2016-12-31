@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Properties;
 import static org.junit.Assert.*;
 
+@Deprecated
 public class PropertiesThemeTest {
 
     @Test

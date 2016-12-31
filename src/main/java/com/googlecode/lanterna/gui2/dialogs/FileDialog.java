@@ -200,13 +200,28 @@ public class FileDialog extends DialogWindow {
                 return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
             }
         });
-        directoryListBox.addItem("..", new Runnable() {
-            @Override
-            public void run() {
-                FileDialog.this.directory = directory.getAbsoluteFile().getParentFile();
-                reloadViews(directory.getAbsoluteFile().getParentFile());
+        if (directory.getAbsoluteFile().getParentFile() !=null){
+            directoryListBox.addItem("..", new Runnable() {
+                @Override
+                public void run() {
+                    FileDialog.this.directory = directory.getAbsoluteFile().getParentFile();
+                    reloadViews(directory.getAbsoluteFile().getParentFile());
+                }
+            });
+        } else {
+            File[] roots = File.listRoots();
+            for (final File entry : roots) {
+                if (entry.canRead()) {
+                    directoryListBox.addItem('[' + entry.getPath() + ']', new Runnable() {
+                        @Override
+                        public void run() {
+                            FileDialog.this.directory = entry;
+                            reloadViews(entry);
+                        }
+                    });
+                }
             }
-        });
+        }
         for(final File entry: entries) {
             if(entry.isHidden() && !showHiddenFilesAndDirs) {
                 continue;

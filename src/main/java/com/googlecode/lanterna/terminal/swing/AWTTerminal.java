@@ -28,7 +28,6 @@ import com.googlecode.lanterna.terminal.IOSafeTerminal;
 import com.googlecode.lanterna.terminal.TerminalResizeListener;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 
@@ -278,6 +277,11 @@ public class AWTTerminal extends Panel implements IOSafeTerminal {
     @Override
     public void flush() {
         terminalImplementation.flush();
+    }
+
+    @Override
+    public void close() {
+        terminalImplementation.close();
     }
 
     @Override

@@ -135,7 +135,7 @@ public class LinearLayout implements LayoutManager {
             height += preferredSize.getRows();
         }
         height += spacing * (components.size() - 1);
-        return new TerminalSize(maxWidth, height);
+        return new TerminalSize(maxWidth, Math.max(0, height));
     }
 
     private TerminalSize getPreferredSizeHorizontally(List<Component> components) {
@@ -149,7 +149,7 @@ public class LinearLayout implements LayoutManager {
             width += preferredSize.getColumns();
         }
         width += spacing * (components.size() - 1);
-        return new TerminalSize(width, maxHeight);
+        return new TerminalSize(Math.max(0,width), maxHeight);
     }
 
     @Override
@@ -177,10 +177,10 @@ public class LinearLayout implements LayoutManager {
                 component.setSize(TerminalSize.ZERO);
             }
             else {
-                LinearLayoutData layoutData = (LinearLayoutData)component.getLayoutData();
                 Alignment alignment = Alignment.Beginning;
-                if(layoutData != null) {
-                    alignment = layoutData.alignment;
+                LayoutData layoutData = component.getLayoutData();
+                if (layoutData instanceof LinearLayoutData) {
+                    alignment = ((LinearLayoutData)layoutData).alignment;
                 }
 
                 TerminalSize preferredSize = component.getPreferredSize();
@@ -222,11 +222,12 @@ public class LinearLayout implements LayoutManager {
                 component.setSize(TerminalSize.ZERO);
             }
             else {
-                LinearLayoutData layoutData = (LinearLayoutData)component.getLayoutData();
                 Alignment alignment = Alignment.Beginning;
-                if(layoutData != null) {
-                    alignment = layoutData.alignment;
+                LayoutData layoutData = component.getLayoutData();
+                if (layoutData instanceof LinearLayoutData) {
+                    alignment = ((LinearLayoutData)layoutData).alignment;
                 }
+
                 TerminalSize preferredSize = component.getPreferredSize();
                 TerminalSize decidedSize = new TerminalSize(
                         Math.min(remainingHorizontalSpace, preferredSize.getColumns()),

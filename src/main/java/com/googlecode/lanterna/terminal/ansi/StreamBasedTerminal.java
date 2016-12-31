@@ -183,7 +183,7 @@ public abstract class StreamBasedTerminal extends AbstractTerminal {
         TerminalPosition cursorPosition = lastReportedCursorPosition;
         while(cursorPosition == null) {
             if(System.currentTimeMillis() - startTime > 5000) {
-                //throw new IllegalStateException("Terminal didn't send any position report for 2 seconds, please file a bug with a reproduce!");
+                //throw new IllegalStateException("Terminal didn't send any position report for 5 seconds, please file a bug with a reproduce!");
                 return null;
             }
             KeyStroke keyStroke = readInput(false, false);
@@ -228,7 +228,7 @@ public abstract class StreamBasedTerminal extends AbstractTerminal {
             try {
                 KeyStroke key = inputDecoder.getNextCharacter(blocking);
                 ScreenInfoAction report = ScreenInfoCharacterPattern.tryToAdopt(key);
-                if(report != null) {
+                if (lastReportedCursorPosition == null && report != null) {
                     lastReportedCursorPosition = report.getPosition();
                 }
                 else {

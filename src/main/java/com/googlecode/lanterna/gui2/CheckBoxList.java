@@ -83,6 +83,13 @@ public class CheckBoxList<V> extends AbstractListBox<V, CheckBoxList<V>> {
         return addItem(object, false);
     }
 
+    @Override
+    public synchronized V removeItem(int index) {
+        V item = super.removeItem(index);
+        itemStatus.remove(index);
+        return item;
+    }
+
     /**
      * Adds an item to the checkbox list with an explicit checked status
      * @param object Object to add to the list
